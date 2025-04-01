@@ -1,10 +1,18 @@
 import pandas as pd
 from glob import glob
+import os
+from configparser import ConfigParser
+# TODOs:
+# - use config file to sepcify the path
 
+config = ConfigParser()
+config.read('./config.ini')
+RAW_DATA_PATH = config.get('Data', 'raw_data')
+INTERIM_DATA_PATH = config.get('Data', 'interim_data')
 # --------------------------------------------------------------
 # List all data in data/raw/MetaMotion
 # --------------------------------------------------------------
-def list_data_files(directory_path="../data/raw/MetaMotion"):
+def list_data_files(directory_path=RAW_DATA_PATH):
     """
     Lists all CSV files in the specified directory.
 
@@ -202,7 +210,7 @@ def resample_data(df_merge, freq='200ms'):
 # --------------------------------------------------------------
 # Export dataset
 # --------------------------------------------------------------
-def export_dataset(df, output_path='../data/interim/01_processed_data.pkl'):
+def export_dataset(df, output_path=INTERIM_DATA_PATH):
     """
     Exports a DataFrame to a pickle file.
     
@@ -210,14 +218,15 @@ def export_dataset(df, output_path='../data/interim/01_processed_data.pkl'):
         df (pd.DataFrame): DataFrame to export
         output_path (str): Path where the pickle file will be saved
     """
-    df.to_pickle(output_path)
+    file_name = '01_processed_data.pkl'
+    df.to_pickle(os.path.join(output_path, file_name))
 # --------------------------------------------------------------
-# Usage example:
-# files = list_data_files() # List all data files
+# # Usage example:
+# files = list_data_files(directory_path=RAW_DATA_PATH) # List all data files
 # df_acc, df_gyr = combine_data_files(files) # Combine data files
 # df_acc, df_gyr = process_datetime_index(df_acc, df_gyr) # Process datetime index
 # df_merge = merge_datasets(df_acc, df_gyr) # Merge datasets
 # df_resampled = resample_data(df_merge) # Resample data
-# export_dataset(df_resampled) # Export the dataset
+# export_dataset(df_resampled, output_path=INTERIM_DATA_PATH) # Export the dataset
 # # read the pickle file
 # df = pd.read_pickle('../data/interim/01_processed_data.pkl')
